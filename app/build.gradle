@@ -1,0 +1,121 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+}
+
+
+def versionMajor = 1
+def versionMinor = 0
+def versionPatch = 0
+
+android {
+    compileSdk Config.COMPILE_SDK
+
+
+    def versionPropsFile = file('version.properties')
+    def Properties versionProps = new Properties()
+
+    if (versionPropsFile.canRead()) {
+        versionProps.load(new FileInputStream(versionPropsFile))
+    } else {
+        versionProps['VERSION_CODE'] = '0'
+    }
+
+    def code = versionProps['VERSION_CODE'].toInteger() + 1
+
+    versionProps['VERSION_CODE'] = code.toString()
+    versionProps.store(versionPropsFile.newWriter(), null)
+
+
+    defaultConfig {
+        applicationId "com.test.nearbyplaces"
+        minSdk Config.MIN_SDK
+        targetSdk Config.TARGET_SDK
+        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + code
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}.${code}"
+
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+
+        resValue "string", "GOOGLE_MAPS_KEY", "YOUR_GOOGLE_MAPS_KEY"
+    }
+    hilt {
+        enableExperimentalClasspathAggregation = true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+        useIR = true
+    }
+    kapt {
+        correctErrorTypes true
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion "1.0.5"
+        kotlinCompilerVersion '1.5.31'
+    }
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude("META-INF/*.kotlin_module")
+    }
+}
+
+dependencies {
+    api project(":domain")
+    api project(":android")
+
+    implementation Android.core
+    implementation Android.appCompat
+    implementation Android.material
+
+    implementation Navigation.compose
+    implementation Navigation.hilt
+
+    implementation Jetpack.composeViewModel
+    implementation Jetpack.lifeCycle
+
+    implementation Accompanist.permissions
+    implementation Accompanist.bottomSheet
+
+
+    implementation Maps.location
+    implementation Maps.googleMap
+    implementation Maps.googleMapUtils
+
+    implementation Compose.ui
+    implementation Compose.material
+    implementation Compose.tooling
+    implementation Compose.activity
+
+
+
+    implementation DI.hiltAndroid
+    kapt DI.hiltCompiler
+
+
+}

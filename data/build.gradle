@@ -1,0 +1,55 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+}
+
+android {
+    compileSdk Config.COMPILE_SDK
+
+    defaultConfig {
+        minSdk Config.MIN_SDK
+        targetSdk Config.TARGET_SDK
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+
+
+        buildConfigField "String", "ARC_GIS_KEY", 'YOUR_ARCGIS_KEY'
+        buildConfigField "String", "ARC_GIS_URL", '"https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer"'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    hilt {
+        enableExperimentalClasspathAggregation = true
+    }
+}
+
+dependencies {
+    implementation project(path: ':domain')
+
+    //DI
+    api DI.hiltAndroid
+    kapt DI.hiltCompiler
+
+
+    //Maps
+    api Maps.arcGis
+
+    api Concurency.coroutines
+    api Concurency.coroutinesCore
+
+}
